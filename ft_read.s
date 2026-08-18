@@ -1,18 +1,20 @@
-extern ___error
+extern __errno_location
 
-global _ft_read
+global ft_read
 
-section .text           ; <-- A ajouter juste avant le début du code
+section .text
 
-_ft_read:
-    mov rax, 0x2000003  ; Syscall read macOS
+ft_read:
+    mov rax, 0
     syscall
-    jc  .error
+    cmp rax, 0
+    jl  .error
     ret
 
 .error:
+    neg rax
     push rax
-    call ___error
+    call __errno_location
     pop rdx
     mov [rax], edx
     mov rax, -1

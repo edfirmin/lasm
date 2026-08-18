@@ -1,37 +1,33 @@
-NAME    = libasm.a
-
-OBJS    = $(SRCS:.s=.o)
-
-NASM    = nasm
+NAME = libasm.a
 
 SRCS = ft_strlen.s ft_strcpy.s ft_strcmp.s ft_write.s ft_read.s ft_strdup.s
 
-NASMFLAGS = -f elf64
+OBJS = $(SRCS:.s=.o)
 
-AR      = ar
-ARFLAGS = rcs
+ASMFLAGS = -f elf64
 
-CC      = cc
-CFLAGS  = -Wall -Wextra -Werror
+RM = rm -f
+
+CC = gcc
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(AR) $(ARFLAGS) $(NAME) $(OBJS)
-
 %.o: %.s
-	nasm -f macho64 $< -o $@
+	nasm $(ASMFLAGS) $< -o $@
 
-# Compile a main.c against the library
-# Usage: make test
-test: $(NAME)
-	$(CC) $(CFLAGS) -arch x86_64 main.c -L. -lasm -o test_libasm
-	./test_libasm
+$(NAME): $(OBJS)
+	ar rcs $(NAME) $(OBJS)
 
 clean:
-	rm -f $(OBJS)
+	$(RM) $(OBJS) test_exe
 
 fclean: clean
-	rm -f $(NAME) test_libasm
+	$(RM) $(NAME)
 
 re: fclean all
+
+test: $(NAME) main.c
+	$(CC) -Wall -Wextra -Werror main.c -L. -lasm -o test_exe
+	./test_exe
+
+.PHONY: all clean fclean re test

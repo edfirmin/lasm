@@ -1,19 +1,21 @@
-extern ___error
+extern __errno_location
 
-global _ft_write
+global ft_write
 
-section .text           ; Directives d'instructions exécutables
+section .text
 
-_ft_write:
-    mov rax, 0x2000004  ; Syscall write macOS x86_64
+ft_write:
+    mov rax, 1
     syscall
-    jc  .error          ; Si Carry Flag = 1, saut vers l'erreur
+    cmp rax, 0
+    jl  .error
     ret
 
 .error:
-    push rax            ; Sauvegarde du code d'erreur
-    call ___error       ; RAX pointe sur errno
+    neg rax
+    push rax
+    call __errno_location
     pop rdx
-    mov [rax], edx      ; *errno = code_erreur
-    mov rax, -1         ; Retourne -1
+    mov [rax], edx
+    mov rax, -1
     ret
